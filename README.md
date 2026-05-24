@@ -1,2 +1,8 @@
 # PlotSafe
 A land transaction webapp
+FRONTEND:
+1.HTML
+2.CSS
+3.JAVASCRIPT
+BACKEND
+1.SUPERBASE
