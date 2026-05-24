@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PlotSafe Botswana | Secure Land Exchange</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/otpauth@9.1.1/dist/otpauth.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        /* ===== YOUR ORIGINAL STYLES (preserved completely) ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #faf7f2; color: #2e2b26; line-height: 1.5; }
+        :root { --deep-forest: #1A3B2E; --serpent-green: #2C5F2D; --earth-moss: #5B7B5A; --clay-brown: #8B5A2B; --sandstone: #D9C9B1; --silver-stone: #B0A9A0; --cream-bg: #F5F0E6; --deep-shadow: rgba(40, 30, 20, 0.12); }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .site-header { background-color: var(--deep-forest); color: #f0ebe4; padding: 16px 0; border-bottom: 3px solid var(--clay-brown); box-shadow: 0 6px 12px rgba(30, 25, 20, 0.15); position: sticky; top: 0; z-index: 100; }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .logo h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.5px; color: #f0e7d8; text-shadow: 2px 2px 0 #3a2c1b; cursor: pointer; }
+        .logo span { color: var(--sandstone); font-size: 1rem; font-weight: 400; display: block; line-height: 1.2; }
+        .nav-links { display: flex; gap: 2rem; font-weight: 500; flex-wrap: wrap; }
+        .nav-links a { color: #e5dccf; text-decoration: none; font-size: 1rem; transition: 0.2s; border-bottom: 2px solid transparent; padding-bottom: 4px; cursor: pointer; }
+        .nav-links a:hover, .nav-links a.active { border-bottom-color: var(--clay-brown); color: #ffffff; }
+        .auth-buttons { display: flex; gap: 12px; }
+        .btn-outline-sand { background: transparent; border: 1.5px solid var(--sandstone); color: var(--sandstone); padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
+        .btn-outline-sand:hover { background: rgba(217, 201, 177, 0.1); border-color: #e5d5b9; }
+        .btn-solid-earth { background-color: var(--clay-brown); border: none; color: #fefaf2; padding: 8px 20px; border-radius: 40px; font-weight: 600; font-size: 0.9rem; cursor: pointer; box-shadow: 0 3px 8px rgba(100, 60, 20, 0.3); border: 1px solid #b57c48; }
+        .hero { background: linear-gradient(135deg, #f0eadb 0%, #e2d6c0 100%); padding: 60px 0; border-bottom: 1px solid var(--sandstone); }
+        .hero .container { display: flex; align-items: center; flex-wrap: wrap; gap: 40px; }
+        .hero-text { flex: 1 1 300px; }
+        .hero-text h2 { font-size: 2.8rem; font-weight: 800; color: var(--deep-forest); line-height: 1.2; margin-bottom: 16px; text-shadow: 1px 1px 0 #c5b59e; }
+        .hero-text p { font-size: 1.2rem; color: #3d362b; margin-bottom: 32px; max-width: 550px; }
+        .cta-group { display: flex; flex-wrap: wrap; gap: 16px; }
+        .btn-primary { background-color: var(--deep-forest); border: none; color: white; padding: 14px 36px; border-radius: 60px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 10px 15px -6px #1f3f2e; cursor: pointer; border-bottom: 3px solid var(--clay-brown); }
+        .btn-secondary { background-color: transparent; border: 2px solid var(--deep-forest); color: var(--deep-forest); padding: 12px 32px; border-radius: 60px; font-weight: 600; font-size: 1.1rem; cursor: pointer; }
+        .hero-image { flex: 1 1 300px; background: #b0a592; height: 240px; border-radius: 40px 12px 40px 12px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23815f3a" opacity="0.3"><polygon points="0,100 20,40 40,70 60,20 80,50 100,10 100,100"/></svg>'); background-size: cover; background-color: #a4917a; background-blend-mode: overlay; border: 4px solid var(--clay-brown); box-shadow: 20px 20px 0 var(--deep-forest); }
+        .trust-row { display: flex; flex-wrap: wrap; justify-content: space-around; background: white; padding: 30px 20px; border-radius: 60px 60px 30px 30px; margin-top: -40px; box-shadow: 0 12px 24px var(--deep-shadow); border: 1px solid #e0cfbc; }
+        .trust-item { display: flex; align-items: center; gap: 12px; font-weight: 600; color: var(--deep-forest); }
+        .trust-item i { font-size: 2rem; color: var(--clay-brown); filter: drop-shadow(2px 2px 0 #c8b595); }
+        .section-title { font-size: 2.2rem; font-weight: 700; color: var(--deep-forest); margin: 60px 0 30px; position: relative; display: inline-block; }
+        .section-title:after { content: ''; display: block; width: 70%; height: 5px; background: var(--clay-brown); border-radius: 4px; margin-top: 8px; }
+        .steps-grid { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+        .step-card { background: #ffffffd9; backdrop-filter: blur(2px); flex: 1 1 250px; padding: 36px 24px 24px; border-radius: 30px 12px 30px 12px; border: 1px solid var(--sandstone); box-shadow: 12px 12px 0 var(--earth-moss); text-align: center; }
+        .step-number { background-color: var(--deep-forest); color: #f0e2d0; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.8rem; margin: -55px auto 20px; border: 3px solid var(--clay-brown); }
+        .plot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px; margin: 30px 0 20px; }
+        .plot-card { background: white; border-radius: 24px 8px 24px 8px; border: 1px solid #d6c6b2; box-shadow: 8px 8px 0 var(--earth-moss); transition: transform 0.1s ease; overflow: hidden; cursor: pointer; }
+        .plot-card:hover { transform: translate(-2px, -2px); box-shadow: 12px 12px 0 #4b6b4a; }
+        .plot-image { height: 160px; background-color: #bba88c; background-image: repeating-linear-gradient(45deg, #9c885f33 0px, #9c885f33 15px, #cdb89333 15px, #cdb89333 30px); background-size: 30px 30px; position: relative; }
+        .verified-badge { position: absolute; top: 12px; right: 12px; background: var(--deep-forest); color: #f5e8d4; padding: 4px 12px; border-radius: 40px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--clay-brown); }
+        .plot-info { padding: 20px 18px 18px; }
+        .plot-info h4 { font-size: 1.25rem; color: #1e2b1a; }
+        .plot-location { color: #7b6b55; font-size: 0.9rem; margin: 6px 0; }
+        .plot-price { font-weight: 700; font-size: 1.3rem; color: var(--deep-forest); }
+        .plot-meta { display: flex; justify-content: space-between; margin-top: 16px; color: #5a4d3c; }
+        .btn-card { background-color: var(--clay-brown); color: white; border: none; padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+        .browse-section { background: #f1e8dc; border-radius: 60px 60px 30px 30px; padding: 30px 20px; margin: 50px 0; }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; background: #e3d5c2; padding: 20px 24px; border-radius: 50px; margin-bottom: 30px; }
+        .filter-chip { background: white; border-radius: 40px; padding: 8px 18px; font-weight: 500; color: var(--deep-forest); border: 1px solid #b8a68b; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: default; }
+        .filter-chip i { color: var(--clay-brown); }
+        .site-footer { background-color: #1e3327; color: #c4bbaa; padding: 48px 0 24px; margin-top: 80px; border-top: 6px solid var(--clay-brown); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 40px; }
+        .footer-col p { margin: 10px 0; cursor: pointer; }
+        .footer-col p:hover { color: #e5d5b9; }
+        .footer-logo { font-weight: 700; font-size: 1.8rem; color: var(--sandstone); }
+        hr { border: none; height: 2px; background: linear-gradient(to right, #b0a692, transparent); margin: 20px 0; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .dashboard-tabs { display: flex; gap: 20px; margin-bottom: 30px; border-bottom: 2px solid var(--sandstone); padding-bottom: 10px; }
+        .tab-btn { background: none; border: none; font-size: 1.2rem; font-weight: 600; color: #5b4e3e; padding: 8px 16px; cursor: pointer; border-radius: 30px 30px 0 0; }
+        .tab-btn.active { background-color: var(--deep-forest); color: #f0e2d0; }
+        .dashboard-panel { display: none; background: #fcf9f4; padding: 30px; border-radius: 30px; border: 1px solid var(--sandstone); }
+        .dashboard-panel.active { display: block; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { text-align: left; color: var(--deep-forest); border-bottom: 2px solid var(--clay-brown); padding: 12px 0; }
+        .table td { padding: 12px 0; border-bottom: 1px solid #e0cfbc; }
+        .badge { background: var(--earth-moss); color: white; padding: 4px 12px; border-radius: 40px; font-size: 0.8rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fcf9f4; max-width: 600px; width: 90%; padding: 30px; border-radius: 40px 12px 40px 12px; border: 4px solid var(--clay-brown); box-shadow: 20px 20px 0 var(--deep-forest); }
+        .modal-content h3 { color: var(--deep-forest); margin-bottom: 20px; }
+        .modal-details p { margin: 8px 0; }
+        .close-modal { float: right; font-size: 1.8rem; cursor: pointer; }
+        .about-grid, .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 40px 0; }
+        .card-slytherin { background: #fcf9f4; padding: 30px; border-radius: 30px 12px 30px 12px; border: 1px solid var(--sandstone); box-shadow: 12px 12px 0 var(--earth-moss); }
+        .contact-form input, .contact-form textarea { width: 100%; padding: 12px; margin: 8px 0 20px; border: 1px solid var(--sandstone); border-radius: 30px; background: white; font-family: inherit; }
+        .contact-form button { background-color: var(--deep-forest); color: white; border: none; padding: 14px 30px; border-radius: 60px; font-weight: 700; cursor: pointer; border-bottom: 3px solid var(--clay-brown); }
+        .map-placeholder { background: #bba88c; height: 200px; border-radius: 30px 12px 30px 12px; border: 2px solid var(--clay-brown); display: flex; align-items: center; justify-content: center; color: #3e3a33; }
+        .flex-btns { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+        .ocr-result { background: #2e2b26; color: #efebdd; padding: 12px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; }
+        @media (max-width: 768px) { .about-grid, .contact-grid { grid-template-columns: 1fr; } .nav-links { gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="logo" id="logoHome"><h1>PlotSafe<span>Botswana</span></h1></div>
+            <div class="nav-links">
+                <a class="nav-link active" data-view="home">Home</a>
+                <a class="nav-link" data-view="browse">Browse</a>
+                <a class="nav-link" data-view="dashboard">Dashboard</a>
+                <a class="nav-link" data-view="how">How it works</a>
+                <a class="nav-link" data-view="about">About</a>
+                <a class="nav-link" data-view="contact">Contact</a>
+                <a class="nav-link" data-view="scannerTools"><i class="fas fa-qrcode"></i> Scan tools</a>
+            </div>
+            <div class="auth-buttons" id="authButtons">
+                <span class="btn-outline-sand" id="loginBtn"><i class="fas fa-user"></i> Sign in</span>
+                <span class="btn-solid-earth" id="registerBtn">Register</span>
+            </div>
+            <div id="userInfo" style="display: none; align-items: center; gap: 12px;">
+                <span id="userEmailSpan" style="color:#d9c9b1;"></span>
+                <span id="logoutBtn" class="btn-outline-sand" style="padding:6px 12px;"><i class="fas fa-sign-out-alt"></i> Logout</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- HOME VIEW -->
+    <div id="homeView" class="view active">
+        <section class="hero"><div class="container"><div class="hero-text"><h2>Buy & sell land <br>with <span style="color: #4f7032; background: #eadbbc; padding:0 12px;">PlotSafe</span></h2><p>Verified plots • Escrow protection • Transparent transfers — finally a marketplace as solid as the earth beneath.</p><div class="cta-group"><span class="btn-primary" id="browseHeroBtn"><i class="fas fa-search"></i> Browse plots</span><span class="btn-secondary" id="listHeroBtn"><i class="fas fa-scroll"></i> List your plot</span></div></div><div class="hero-image"></div></div></section>
+        <div class="container"><div class="trust-row"><div class="trust-item"><i class="fas fa-check-circle"></i> <span>Landboard‑verified</span></div><div class="trust-item"><i class="fas fa-shield-alt"></i> <span>Escrow secured</span></div><div class="trust-item"><i class="fas fa-file-signature"></i> <span>Legal oversight</span></div><div class="trust-item"><i class="fas fa-map-marked-alt"></i> <span>Nationwide plots</span></div></div></div>
+        <div class="container"><h2 class="section-title">How PlotSafe works</h2><div class="steps-grid"><div class="step-card"><div class="step-number">1</div><h3><i class="fas fa-cloud-upload-alt"></i> List & verify</h3><p>Seller uploads deed & ID. Our team verifies with Landboard — only genuine plots go live.</p></div><div class="step-card"><div class="step-number">2</div><h3><i class="fas fa-hand-holding-usd"></i> Secure escrow</h3><p>Buyer pays into protected account. Funds held until transfer conditions are met.</p></div><div class="step-card"><div class="step-number">3</div><h3><i class="fas fa-exchange-alt"></i> Transfer title</h3><p>Ownership passes, funds released. Both parties get confirmation & documents.</p></div></div></div>
+        <div class="container"><h2 class="section-title">Recently verified plots</h2><div id="featuredPlots" class="plot-grid"></div></div>
+    </div>
+
+    <!-- BROWSE VIEW -->
+    <div id="browseView" class="view"><div class="container browse-section" style="margin-top: 30px;"><h2 class="section-title" style="margin-top: 0;">Browse all plots</h2><div class="filter-row"><span class="filter-chip"><i class="fas fa-location-dot"></i> Gaborone</span><span class="filter-chip"><i class="fas fa-location-dot"></i> Francistown</span><span class="filter-chip"><i class="fas fa-location-dot"></i> Palapye</span><span class="filter-chip"><i class="fas fa-sliders"></i> Price range</span><span class="filter-chip"><i class="fas fa-ruler-combined"></i> Size</span><span class="filter-chip" style="background: var(--deep-forest); color: #f0e3d3;"><i class="fas fa-check-circle"></i> Verified only</span></div><div id="allPlotsGrid" class="plot-grid"></div><div style="text-align: right; margin-top: 20px;"><span class="btn-outline-sand" style="border-color: var(--deep-forest); color: var(--deep-forest);">View all <i class="fas fa-arrow-right"></i></span></div></div></div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="view"><div class="container"><h2 class="section-title">Your dashboard</h2><div class="dashboard-tabs"><button class="tab-btn active" data-dashboard="buyer">Buyer overview</button><button class="tab-btn" data-dashboard="seller">Seller overview</button><button class="tab-btn" data-dashboard="2fa">2FA & Security</button></div><div id="buyerPanel" class="dashboard-panel active"><h3>Active purchases & escrow</h3><table class="table" id="buyerTransactionsTable"><thead><tr><th>Plot</th><th>Amount</th><th>Status</th></tr></thead><tbody><tr><td colspan="3">Loading transactions...</td></tr></tbody></table><h3 style="margin-top:30px;">Watchlist</h3><table class="table" id="watchlistTable"><tbody><tr><td>Extension 9, Palapye</td><td>P157,000</td></tr></tbody></table></div><div id="sellerPanel" class="dashboard-panel"><h3>My listings & sales</h3><table class="table" id="sellerTransactionsTable"><thead><tr><th>Plot</th><th>Escrow amount</th><th>Status</th></tr></thead><tbody><tr><td colspan="3">No active sales</td></tr></tbody></table></div><div id="twofaPanel" class="dashboard-panel"><h3>Two-Factor Authentication (TOTP)</h3><div id="twofaStatus"></div><button id="enable2faBtn" class="btn-solid-earth" style="margin-top:16px;">Enable 2FA</button><div id="qrcodeContainer" style="margin-top:20px;"></div><div id="verify2faSection" style="display:none; margin-top:16px;"><p>Enter verification code to activate:</p><input type="text" id="totpCodeInput" placeholder="6-digit code" style="padding:10px; border-radius:40px; border:1px solid var(--sandstone);"><button id="verifyTotpBtn" class="btn-outline-sand" style="margin-top:10px;">Verify & Activate</button></div></div></div></div>
+
+    <!-- HOW IT WORKS VIEW -->
+    <div id="howView" class="view"><div class="container" style="min-height: 400px; padding: 40px 0;"><h2 class="section-title">How PlotSafe works</h2><p style="font-size: 1.2rem; margin-bottom: 30px;">PlotSafe is a trusted intermediary that verifies land ownership and secures payments via escrow. Every plot is checked with the Department of Landboard before listing. Buyers pay into an escrow account; funds are released only after the title is transferred.</p><div style="background: #e3d5c2; padding: 30px; border-radius: 40px;"><h3>Frequently asked questions</h3><p><strong>How long does verification take?</strong> Usually 2-3 business days.</p><p><strong>What if the seller is fraudulent?</strong> We verify ownership, so fraud is prevented.</p><p><strong>Is my money safe?</strong> Yes, funds are held in a regulated escrow account.</p></div></div></div>
+
+    <!-- ABOUT VIEW -->
+    <div id="aboutView" class="view"><div class="container" style="padding: 40px 0;"><h2 class="section-title">About PlotSafe</h2><div class="about-grid"><div class="card-slytherin"><h3><i class="fas fa-house"></i> Our mission</h3><p>To eradicate land fraud in Botswana by creating a transparent, verifiable, and secure marketplace.</p></div><div class="card-slytherin"><h3><i class="fas fa-handshake"></i> Our story</h3><p>Founded in 2026, PlotSafe emerged from the urgent need to protect citizens from scammers.</p></div><div class="card-slytherin"><h3><i class="fas fa-users"></i> The team</h3><p>Real estate experts, legal minds, and tech innovators.</p></div><div class="card-slytherin"><h3><i class="fas fa-leaf"></i> Values</h3><p>Integrity, transparency, and innovation – rooted in the earth of Botswana.</p></div></div></div></div>
+
+    <!-- CONTACT VIEW -->
+    <div id="contactView" class="view"><div class="container" style="padding: 40px 0;"><h2 class="section-title">Contact us</h2><div class="contact-grid"><div class="card-slytherin"><h3><i class="fas fa-paper-plane"></i> Send a message</h3><form class="contact-form" onsubmit="event.preventDefault(); alert('Message sent (demo)');"><label>Name</label><input type="text" placeholder="Your name"><label>Email</label><input type="email" placeholder="you@example.com"><label>Message</label><textarea rows="4" placeholder="How can we help?"></textarea><button type="submit">Send <i class="fas fa-arrow-right"></i></button></form></div><div><div class="card-slytherin" style="margin-bottom:20px;"><h3><i class="fas fa-map-marker-alt"></i> Contact us</h3><p>PlotSafe, Gaborone, Botswana</p><p><i class="fas fa-phone-alt"></i> +267 72 382 156</p></div><div class="map-placeholder"><i class="fas fa-map" style="font-size:3rem;"></i> map coming soon</div></div></div></div></div>
+
+    <!-- SCANNER TOOLS VIEW -->
+    <div id="scannerToolsView" class="view"><div class="container" style="padding: 40px 0;"><h2 class="section-title">QR & Document Scanner</h2><div class="flex-btns"><button id="startQrScannerBtn" class="btn-solid-earth"><i class="fas fa-qrcode"></i> Scan Plot QR</button><button id="startDocScannerBtn" class="btn-outline-sand"><i class="fas fa-camera"></i> Scan Title Deed (OCR)</button></div><div id="qrReaderSection" style="display:none;"><div id="qr-reader" style="width:100%; max-width:500px;"></div><p id="qrResult"></p></div><div id="docScannerSection" style="display:none;"><video id="videoPreview" autoplay playsinline style="width:100%; max-width:500px; border-radius:24px; border:2px solid var(--clay-brown);"></video><div class="flex-btns"><button id="capturePhotoBtn" class="btn-solid-earth">Capture Document</button><button id="stopCameraBtn" class="btn-outline-sand">Stop Camera</button></div><canvas id="photoCanvas" style="display:none;"></canvas><div id="ocrOutput" class="ocr-result"></div></div></div></div>
+
+    <!-- PLOT MODAL -->
+    <div id="plotModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeModal">&times;</span><h3 id="modalTitle">Plot details</h3><div id="modalDetails" class="modal-details"></div><div style="margin-top:30px; display:flex; gap:10px;"><span id="expressInterestBtn" class="btn-solid-earth" style="padding:12px 24px;">Express interest</span><span class="btn-outline-sand" style="border-color: var(--deep-forest); color: var(--deep-forest);">Request info</span></div></div></div>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal"><div class="modal-content" style="max-width:480px;"><span class="close-modal" id="closeAuthModal">&times;</span><div id="authTabs" style="display:flex; gap:20px; margin-bottom:20px;"><button id="showLoginTab" class="tab-btn active">Sign In</button><button id="showSignupTab" class="tab-btn">Sign Up</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="Email" style="width:100%; margin:10px 0; padding:12px;"><input type="password" id="loginPassword" placeholder="Password" style="width:100%; margin:10px 0; padding:12px;"><div id="totpChallengeDiv" style="display:none;"><input type="text" id="totpToken" placeholder="Authenticator code" style="width:100%; margin:10px 0; padding:12px;"></div><button id="doLoginBtn" class="btn-solid-earth">Sign in</button><button id="googleLoginBtn" class="btn-outline-sand" style="margin-top:12px; width:100%;"><i class="fab fa-google"></i> Continue with Google</button></div><div id="signupForm" style="display:none;"><input type="email" id="signupEmail" placeholder="Email" style="width:100%; margin:10px 0; padding:12px;"><input type="password" id="signupPassword" placeholder="Password" style="width:100%; margin:10px 0; padding:12px;"><button id="doSignupBtn" class="btn-solid-earth">Register</button></div><div id="authMessage" style="color:#b04e2a; margin-top:12px;"></div></div></div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer"><div class="container footer-grid"><div class="footer-col"><div class="footer-logo">PLOTSAFE</div><p><i class="fas fa-leaf"></i> secure land transactions, rooted in trust.</p></div><div class="footer-col"><h4 style="color: var(--sandstone);">Platform</h4><p class="footer-link" data-view="browse">Browse plots</p><p class="footer-link" data-view="dashboard">List a plot</p><p class="footer-link" data-view="how">How escrow works</p></div><div class="footer-col"><h4 style="color: var(--sandstone);">Resources</h4><p class="footer-link" data-view="how">Verification process</p><p class="footer-link" data-view="about">Legal partners</p><p class="footer-link" data-view="how">FAQs</p></div><div class="footer-col"><h4 style="color: var(--sandstone);">Contact</h4><p class="footer-link" data-view="contact">+267 72 382 156</p><p class="footer-link" data-view="contact">Gaborone, Botswana</p></div></div><hr><div class="container" style="text-align: center; font-size: 0.85rem; color: #9b927d;">PlotSafe Botswana <i class="fas fa-mountain"></i></div></footer>
+
+    <script>
+        // ========== SUPABASE CONFIGURATION (REPLACE THESE TWO VALUES) ==========
+        const PLOTSAFE_SUPABASE_URL = "https://cyfyfkikcfllgroeuloh.supabase.co";   // <-- CHANGE THIS
+        const PLOTSAFE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5Znlma2lrY2ZsbGdyb2V1bG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzQyNzksImV4cCI6MjA5NDk1MDI3OX0.bh2tN22Hm-ZhYLTqHvZVXXG92mOTk0b-O149Ybn90qI";                 // <-- CHANGE THIS
+        // ====================================================================
+        
+        (function() {
+            // Initialize Supabase
+            const supabase = window.supabase.createClient(PLOTSAFE_SUPABASE_URL, PLOTSAFE_SUPABASE_ANON_KEY);
+            
+            // Global state
+            let currentUser = null;
+            let currentTwoFactorPending = null;
+            let currentSecret = null;
+            let html5QrCode = null;
+            let mediaStream = null;
+
+            // DOM elements
+            const authModal = document.getElementById('authModal');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const authButtonsDiv = document.getElementById('authButtons');
+            const userInfoDiv = document.getElementById('userInfo');
+            const userEmailSpan = document.getElementById('userEmailSpan');
+            const logoutSpan = document.getElementById('logoutBtn');
+            const video = document.getElementById('videoPreview');
+            const canvas = document.getElementById('photoCanvas');
+            const ocrDiv = document.getElementById('ocrOutput');
+
+            // Helper: refresh UI
+            async function checkSession() {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (session) {
+                    currentUser = session.user;
+                    authButtonsDiv.style.display = 'none';
+                    userInfoDiv.style.display = 'flex';
+                    userEmailSpan.innerText = session.user.email;
+                    if (document.getElementById('dashboardView').classList.contains('active')) loadDashboardData();
+                    loadPlotsFromDB();
+                } else {
+                    currentUser = null;
+                    authButtonsDiv.style.display = 'flex';
+                    userInfoDiv.style.display = 'none';
+                }
+            }
+
+            // Load plots
+            async function loadPlotsFromDB() {
+                const { data: plots, error } = await supabase.from('plots').select('*');
+                if (!error && plots && plots.length) {
+                    renderPlotsGrid('featuredPlots', plots.slice(0,4));
+                    renderPlotsGrid('allPlotsGrid', plots);
+                } else {
+                    const demoPlots = [
+                        { id:1, title:'Plot 451, Block 8', location:'Gaborone', price:285000, size:550, type:'Residential' },
+                        { id:2, title:'Farm 12, Tati', location:'Francistown', price:420000, size:1200, type:'Commercial' },
+                        { id:3, title:'Extension 9, Plot 77', location:'Palapye', price:157000, size:400, type:'Residential' },
+                        { id:4, title:'Plot 23, Maun', location:'Maun', price:325000, size:680, type:'Tourism' }
+                    ];
+                    renderPlotsGrid('featuredPlots', demoPlots.slice(0,4));
+                    renderPlotsGrid('allPlotsGrid', demoPlots);
+                }
+            }
+
+            function renderPlotsGrid(containerId, plots) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '';
+                plots.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'plot-card';
+                    card.setAttribute('data-id', p.id);
+                    card.innerHTML = `
+                        <div class="plot-image"><span class="verified-badge"><i class="fas fa-seedling"></i> verified</span></div>
+                        <div class="plot-info">
+                            <h4>${escapeHtml(p.title)}</h4><div class="plot-location"><i class="fas fa-map-pin"></i> ${escapeHtml(p.location)}</div>
+                            <div class="plot-price">P ${p.price.toLocaleString()}</div><div class="plot-meta"><span>${p.size} m²</span><span>${escapeHtml(p.type)}</span></div>
+                            <div style="margin-top:16px;"><span class="btn-card">View details →</span></div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => showPlotModal(p));
+                    container.appendChild(card);
+                });
+            }
+
+            function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+            function showPlotModal(plot) {
+                const modal = document.getElementById('plotModal');
+                document.getElementById('modalTitle').innerText = plot.title;
+                document.getElementById('modalDetails').innerHTML = `<p><strong>Location:</strong> ${plot.location}</p><p><strong>Price:</strong> P ${plot.price.toLocaleString()}</p><p><strong>Size:</strong> ${plot.size} m²</p><p><strong>Type:</strong> ${plot.type}</p><p><strong>Verification:</strong> ✅ Confirmed with Landboard</p><p><strong>Escrow eligible:</strong> Yes</p>`;
+                modal.classList.add('active');
+                document.getElementById('expressInterestBtn').onclick = async () => {
+                    if (!currentUser) { alert('Please login first'); authModal.classList.add('active'); return; }
+                    alert(`Interest expressed for ${plot.title}. A seller agent will contact you.`);
+                };
+            }
+
+            async function loadDashboardData() {
+                if (!currentUser) return;
+                const { data: buyerTx } = await supabase.from('transactions').select('*, plots(title)').eq('buyer_id', currentUser.id);
+                const buyerTable = document.querySelector('#buyerTransactionsTable tbody');
+                if (buyerTx && buyerTx.length) {
+                    buyerTable.innerHTML = buyerTx.map(tx => `<tr><td>${tx.plots?.title || 'N/A'}</td><td>P ${tx.escrow_amount}</td><td><span class="badge">${tx.status}</span></td></tr>`).join('');
+                } else { buyerTable.innerHTML = '<tr><td colspan="3">No active purchases</td></tr>'; }
+                const { data: sellerTx } = await supabase.from('transactions').select('*, plots(title)').eq('seller_id', currentUser.id);
+                const sellerTable = document.querySelector('#sellerTransactionsTable tbody');
+                if (sellerTx && sellerTx.length) {
+                    sellerTable.innerHTML = sellerTx.map(tx => `<tr><td>${tx.plots?.title}</td><td>P ${tx.escrow_amount}</td><td>${tx.status}</td></tr>`).join('');
+                } else { sellerTable.innerHTML = '<tr><td colspan="3">No active sales</td></tr>'; }
+            }
+
+            // 2FA
+            document.getElementById('enable2faBtn')?.addEventListener('click', async () => {
+                if (!currentUser) { alert('Login first'); return; }
+                const secret = new OTPAuth.Secret({ size: 20 });
+                const totp = new OTPAuth.TOTP({ issuer: "PlotSafe", label: currentUser.email, secret: secret.base32 });
+                currentSecret = secret.base32;
+                const otpauthUrl = totp.toString();
+                document.getElementById('qrcodeContainer').innerHTML = "<div id='qrcode'></div>";
+                new QRCode(document.getElementById("qrcode"), { text: otpauthUrl, width: 200, height: 200 });
+                document.getElementById('verify2faSection').style.display = 'block';
+                document.getElementById('verifyTotpBtn').onclick = async () => {
+                    const code = document.getElementById('totpCodeInput').value;
+                    const isValid = totp.validate({ token: code, window: 1 }) !== null;
+                    if (isValid) {
+                        const { error } = await supabase.from('user_profiles').upsert({ user_id: currentUser.id, two_factor_secret: currentSecret, two_factor_enabled: true });
+                        if (!error) alert('2FA enabled successfully!');
+                        else alert('Error saving 2FA secret');
+                    } else alert('Invalid code');
+                };
+            });
+
+            async function handleSignIn(email, password, totpCode = null) {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) { document.getElementById('authMessage').innerText = error.message; return false; }
+                const { data: profile } = await supabase.from('user_profiles').select('two_factor_enabled, two_factor_secret').eq('user_id', data.user.id).single();
+                if (profile?.two_factor_enabled) {
+                    if (!totpCode) {
+                        document.getElementById('totpChallengeDiv').style.display = 'block';
+                        document.getElementById('authMessage').innerText = '2FA required: enter your authenticator code';
+                        currentTwoFactorPending = { user: data.user };
+                        return false;
+                    } else {
+                        const totp = new OTPAuth.TOTP({ secret: profile.two_factor_secret });
+                        const valid = totp.validate({ token: totpCode, window: 1 }) !== null;
+                        if (!valid) { document.getElementById('authMessage').innerText = 'Invalid 2FA code'; return false; }
+                    }
+                }
+                currentUser = data.user;
+                checkSession();
+                authModal.classList.remove('active');
+                if (document.getElementById('dashboardView').classList.contains('active')) loadDashboardData();
+                location.reload();
+                return true;
+            }
+
+            document.getElementById('doLoginBtn').onclick = async () => {
+                const email = document.getElementById('loginEmail').value;
+                const pwd = document.getElementById('loginPassword').value;
+                const totp = document.getElementById('totpToken').value;
+                await handleSignIn(email, pwd, totp);
+            };
+            document.getElementById('doSignupBtn').onclick = async () => {
+                const email = document.getElementById('signupEmail').value;
+                const pwd = document.getElementById('signupPassword').value;
+                const { error } = await supabase.auth.signUp({ email, password: pwd });
+                if (error) alert(error.message); else { alert('Registration success! Please verify email (if enabled). You can now login.'); authModal.classList.remove('active'); }
+            };
+            document.getElementById('googleLoginBtn').onclick = async () => { await supabase.auth.signInWithOAuth({ provider: 'google' }); };
+            logoutSpan.onclick = async () => { await supabase.auth.signOut(); checkSession(); window.location.reload(); };
+
+            // QR Scanner
+            document.getElementById('startQrScannerBtn').onclick = () => {
+                document.getElementById('qrReaderSection').style.display = 'block';
+                document.getElementById('docScannerSection').style.display = 'none';
+                if (html5QrCode) html5QrCode.stop().catch(console.log);
+                html5QrCode = new Html5Qrcode("qr-reader");
+                html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+                    document.getElementById('qrResult').innerHTML = `✅ Scanned: ${decodedText}<br>Plot lookup: `;
+                    supabase.from('plots').select('*').eq('id', decodedText).single().then(({data}) => {
+                        if(data) document.getElementById('qrResult').innerHTML += `Found plot: ${data.title} - Verified`;
+                        else document.getElementById('qrResult').innerHTML += `No plot found with ID ${decodedText}`;
+                    });
+                }, (err) => console.warn(err));
+            };
+            document.getElementById('startDocScannerBtn').onclick = async () => {
+                document.getElementById('docScannerSection').style.display = 'block';
+                document.getElementById('qrReaderSection').style.display = 'none';
+                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                    video.srcObject = stream;
+                    mediaStream = stream;
+                    video.play();
+                } catch(e) { ocrDiv.innerText = "Camera error: "+e.message; }
+            };
+            document.getElementById('capturePhotoBtn').onclick = () => {
+                if (!video.videoWidth) return;
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                ocrDiv.innerText = "Running OCR on document... (Tesseract.js)";
+                Tesseract.recognize(canvas, 'eng', { logger: m => console.log(m) }).then(({ data: { text } }) => {
+                    ocrDiv.innerHTML = `<strong>📄 Extracted text (deed info):</strong><br>${text.substring(0, 800)}<br><i>Use this data for verification</i>`;
+                }).catch(err => ocrDiv.innerText = "OCR error: "+err);
+            };
+            document.getElementById('stopCameraBtn').onclick = () => { if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop()); video.srcObject=null; };
+
+            // Navigation
+            const views = {
+                home: document.getElementById('homeView'),
+                browse: document.getElementById('browseView'),
+                dashboard: document.getElementById('dashboardView'),
+                how: document.getElementById('howView'),
+                about: document.getElementById('aboutView'),
+                contact: document.getElementById('contactView'),
+                scannerTools: document.getElementById('scannerToolsView')
+            };
+            function setActiveView(viewId) {
+                Object.values(views).forEach(v => v.classList.remove('active'));
+                views[viewId].classList.add('active');
+                if (viewId === 'dashboard' && currentUser) loadDashboardData();
+                if (viewId === 'browse') loadPlotsFromDB();
+            }
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => { e.preventDefault(); setActiveView(link.dataset.view); });
+            });
+            document.getElementById('logoHome').addEventListener('click', () => setActiveView('home'));
+            document.getElementById('browseHeroBtn').addEventListener('click', () => setActiveView('browse'));
+            document.getElementById('listHeroBtn').addEventListener('click', () => { if (!currentUser) alert('Please login to list your plot'); else setActiveView('dashboard'); });
+            document.querySelectorAll('.footer-link').forEach(el => { el.addEventListener('click', () => { if (el.dataset.view) setActiveView(el.dataset.view); }); });
+
+            // Dashboard tabs
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const buyerPanel = document.getElementById('buyerPanel'), sellerPanel = document.getElementById('sellerPanel'), twofaPanel = document.getElementById('twofaPanel');
+            tabBtns.forEach(btn => btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (btn.dataset.dashboard === 'buyer') { buyerPanel.classList.add('active'); sellerPanel.classList.remove('active'); twofaPanel.classList.remove('active'); }
+                else if (btn.dataset.dashboard === 'seller') { buyerPanel.classList.remove('active'); sellerPanel.classList.add('active'); twofaPanel.classList.remove('active'); }
+                else if (btn.dataset.dashboard === '2fa') { buyerPanel.classList.remove('active'); sellerPanel.classList.remove('active'); twofaPanel.classList.add('active'); if(currentUser) load2FAStatus(); }
+            }));
+            async function load2FAStatus() {
+                const { data } = await supabase.from('user_profiles').select('two_factor_enabled').eq('user_id', currentUser?.id).single();
+                document.getElementById('twofaStatus').innerHTML = data?.two_factor_enabled ? "✅ 2FA is active" : "⚠️ 2FA not enabled. Click below to set up.";
+            }
+
+            // Modal close handlers
+            document.getElementById('closeModal').addEventListener('click', () => document.getElementById('plotModal').classList.remove('active'));
+            document.getElementById('closeAuthModal').addEventListener('click', () => authModal.classList.remove('active'));
+            window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) e.target.classList.remove('active'); });
+            loginBtn.addEventListener('click', () => authModal.classList.add('active'));
+            registerBtn.addEventListener('click', () => { authModal.classList.add('active'); document.getElementById('showSignupTab').click(); });
+            document.getElementById('showLoginTab').onclick = () => { document.getElementById('loginForm').style.display='block'; document.getElementById('signupForm').style.display='none'; document.getElementById('totpChallengeDiv').style.display='none'; };
+            document.getElementById('showSignupTab').onclick = () => { document.getElementById('loginForm').style.display='none'; document.getElementById('signupForm').style.display='block'; };
+
+            // Start
+            checkSession();
+            loadPlotsFromDB();
+            console.log("PlotSafe fully loaded – buttons should work now.");
+        })();
+    </script>
+</body>
+</html>
